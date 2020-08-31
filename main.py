@@ -10,7 +10,7 @@ class timetable:
     facultyid = "&faculty=" # id факультета
     kurs = "&kurs=" # номер курса
     groupid = "&group=" # id группы
-    year = "&schet="
+    year = "&schet=" # период обучения
     def getYears () :
         link = timetable.domain
         soup = BeautifulSoup(req.get(link).text, 'html.parser')
@@ -24,7 +24,6 @@ class timetable:
         except:
             print("Something went wrong in getYears()!")
             return {'error':'Something wrong'}
-
     def getTypeTimeTable ():
         link = timetable.domain
         soup = BeautifulSoup(req.get(link).text, 'html.parser')
@@ -37,7 +36,6 @@ class timetable:
         except:
             print("Something went wrong in getTypeTimeTable()!")
             return {'error':'Something wrong'}
-
     def getFacultet(type_z, schet):
         kurs = '0'
         facultet = {'facultet': []}
@@ -55,6 +53,8 @@ class timetable:
             return {'error':'Something wrong'}
     def getCourse (facultet):
         if facultet == "56682":
+            return [1, 2]
+        elif facultet == 56682:
             return [1, 2]
         else:
             return [1, 2, 3, 4, 5]
@@ -80,7 +80,6 @@ class timetable:
             print({"error":404, "description":'Такого расписания нет'})
             return {"error":404, "description":'Такого расписания нет'}
         else:
-            # print({"error":"Расписания есть"})
             # print(soup.find('table', attrs={'class':'simple-little-table'}))
             keys = []
             for item in soup.find('table', attrs={'class':'simple-little-table'}).find_all('th'):
@@ -92,7 +91,7 @@ class timetable:
                 # timetableresp['timetable'][1][keys[1]].append( "meme")
                 # print(timetableresp['timetable'])
                 temp = soup.find('table', attrs={'class':'simple-little-table'}).find_all('tr')[1] #.find_all('td')[0] #.find_all('div', attrs={'class':'pair'})[0]
-                # print(temp.find_all('td')[0].text[0:1].isdigit())
+                print(temp.find_all('td')[1].text == " ")
                 para = []
                 for item in soup.find('table', attrs={'class':'simple-little-table'}).find_all('tr'):
                     if item.find('td') != None:
@@ -106,12 +105,29 @@ class timetable:
                     for row in table.find_all('td'): # здесь смотрим по горизонтальным столбикам (row)
                         print("day = "+str(keys[day]))
                         if day == 0:
+                            timetableresp['timetable'][day][keys[day]].append(para[ipara])
                             print(para[ipara])
                             ipara+=1
-                        day+=1
-                        for column in row.find_all('div', attrs={'class':'pair'}): # здесь уже смотрим саму ячейку
-                            print(timetable.getInfoAboutLesson(column))
 
+                        if row.text != " ":
+                            lesson = []
+
+                            for column in row.find_all('div', attrs={'class':'pair'}): # здесь уже смотрим саму ячейку
+                                # lesson.append(timetable.getInfoAboutLesson(column))
+                                temp = timetable.getInfoAboutLesson(column)
+                                # print(temp[0])
+                                timetableresp['timetable'][day][keys[day]].append({'lesson':temp[0], 'para':para[ipara-1]})
+
+
+                            # print("lesson = "+str(lesson))
+                            # for less in lesson:
+                            #     timetableresp['timetable'][day][keys[day]].append(less)
+                        else:
+                            day += 1
+                            continue
+                        day += 1
+
+                print(json.loads(str(timetableresp['timetable']).replace("'",'"')))
 
                 # print(timetable.getInfoAboutLesson(temp))
                 # print(json.loads(str(timetable.getInfoAboutLesson(temp)).replace("'",'"')))
@@ -170,6 +186,8 @@ class timetable:
             lectureHall['lectureHall'].append({'error': 404, 'description':'Do not have lecture hall'})
         # data = {'data': []}
         # data['data'].append()
-        return [predmet, typeLesson, studyWeeks, teachers, lectureHall]
+        data = {'data': [{'predmet': predmet['predmet'], 'studyWeeks':studyWeeks['studyWeeks'], 'teachers':teachers['teachers'], 'lectureHall':lectureHall['lectureHall']}]}
+        return data['data']
 timetable.getTimeTable("205.1920/2", '1', "50554", '3', '53954')
 #http://cabinet.sut.ru/raspisanie_all_new.php?&type_z=1&faculty=50029&kurs=2&group=53776&schet=205.1920/1
+# 205.2021/1
