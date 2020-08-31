@@ -77,7 +77,7 @@ class timetable:
         soup = BeautifulSoup(req.get(link).text, 'html.parser')
         timetableresp = {"timetable": []}
         if soup.find(string=re.compile("Занятий для выбранной группы не найдено")) != None:
-            print({"error":404, "description":'Такого расписания нет'})
+            # print({"error":404, "description":'Такого расписания нет'})
             return {"error":404, "description":'Такого расписания нет'}
         else:
             # print(soup.find('table', attrs={'class':'simple-little-table'}))
@@ -86,67 +86,64 @@ class timetable:
                 # print(item.text)
                 keys.append(item.text)
                 timetableresp['timetable'].append({item.text: []})
-            print(keys)
+            # print(keys)
             if type_z == "1":
-                # timetableresp['timetable'][1][keys[1]].append( "meme")
-                # print(timetableresp['timetable'])
                 temp = soup.find('table', attrs={'class':'simple-little-table'}).find_all('tr')[1] #.find_all('td')[0] #.find_all('div', attrs={'class':'pair'})[0]
-                print(temp.find_all('td')[1].text == " ")
+                # print(temp.find_all('td')[1].text == " ")
                 para = []
                 for item in soup.find('table', attrs={'class':'simple-little-table'}).find_all('tr'):
                     if item.find('td') != None:
                         temp = item.find('td').text.replace(')', '').replace(' ', '').split('(')
                         para.append({'para':temp[0], 'time': temp[1]})
-                        # print(item.find('td').text.replace(')', '').replace(' ', '').split('('))
-                print(para)
+                # print(para)
                 ipara = 0
                 for table in soup.find('table', attrs={'class':'simple-little-table'}).find_all('tr'): # берем и листаем всю таблицу
                     day = 0
                     for row in table.find_all('td'): # здесь смотрим по горизонтальным столбикам (row)
-                        print("day = "+str(keys[day]))
+                        # print("day = "+str(keys[day]))
                         if day == 0:
                             timetableresp['timetable'][day][keys[day]].append(para[ipara])
-                            print(para[ipara])
+                            # print(para[ipara])
                             ipara+=1
-
                         if row.text != " ":
-                            lesson = []
-
                             for column in row.find_all('div', attrs={'class':'pair'}): # здесь уже смотрим саму ячейку
-                                # lesson.append(timetable.getInfoAboutLesson(column))
                                 temp = timetable.getInfoAboutLesson(column)
                                 # print(temp[0])
                                 timetableresp['timetable'][day][keys[day]].append({'lesson':temp[0], 'para':para[ipara-1]})
-
-
-                            # print("lesson = "+str(lesson))
-                            # for less in lesson:
-                            #     timetableresp['timetable'][day][keys[day]].append(less)
                         else:
                             day += 1
                             continue
                         day += 1
-
-                print(json.loads(str(timetableresp['timetable']).replace("'",'"')))
-
-                # print(timetable.getInfoAboutLesson(temp))
-                # print(json.loads(str(timetable.getInfoAboutLesson(temp)).replace("'",'"')))
-
-            # возможные поддержки расписаний
+            # возможные поддержки расписаний. Делать я это не буду но возможно подумаю. Но расписание сессий когда-нибудь сделаю
             elif type_z == "2":
-                print("Это расписание сессий")
+                msg = "Это расписание сессий"
+                print(msg)
+                return {'error':404, 'description':msg}
             elif type_z == "3":
-                print("Это расписание факультативов")
+                msg = "Это расписание факультативов"
+                print(msg)
+                return {'error': 404, 'description': msg}
             elif type_z == "4":
-                print("Это расписание сессий для заочников")
+                msg = "Это расписание сессий для заочников"
+                print(msg)
+                return {'error': 404, 'description': msg}
             elif type_z == "5":
-                print("Это расписание ГИА")
+                msg = "Это расписание ГИА"
+                print(msg)
+                return {'error': 404, 'description': msg}
             elif type_z == "6":
-                print("Это расписание канфиренций и прочего")
+                msg ("Это расписание канфиренций и прочего")
+                print(msg)
+                return {'error': 404, 'description': msg}
             elif type_z == "9":
-                print("Это расписание контроля занятий")
+                msg = "Это расписание контроля занятий"
+                print(msg)
+                return {'error': 404, 'description': msg}
             else:
-                print("Хз что это. Куда ты опять попал?!!!???! И почему это сработало??!?!?!")
+                msg = "Хз что это. Куда ты опять попал?!!!???! И почему это сработало??!?!?!"
+                print(msg)
+                return {'error': 404, 'description': msg}
+        return timetableresp['timetable']
 
     def getInfoAboutLesson(lesson): # ожидается тэг <div class="pair" weekday="2" pair="2"> с его содержимым
         predmet = {'predmet': []}
@@ -188,6 +185,4 @@ class timetable:
         # data['data'].append()
         data = {'data': [{'predmet': predmet['predmet'], 'studyWeeks':studyWeeks['studyWeeks'], 'teachers':teachers['teachers'], 'lectureHall':lectureHall['lectureHall']}]}
         return data['data']
-timetable.getTimeTable("205.1920/2", '1', "50554", '3', '53954')
-#http://cabinet.sut.ru/raspisanie_all_new.php?&type_z=1&faculty=50029&kurs=2&group=53776&schet=205.1920/1
-# 205.2021/1
+# print(timetable.getTimeTable("205.1920/2", '1', "50554", '3', '53954'))
