@@ -205,6 +205,6 @@ class timetable:
 
 timetable = timetable()
 
-rasp = str(timetable.getTimeTable("205.1920/2", '1', "50554", '3', '53954'))
-rasp = rasp.replace("'", '"')
-print(rasp)
+# rasp = str(timetable.getTimeTable("205.1920/2", '1', "50554", '3', '53954'))
+# rasp = rasp.replace("'", '"')
+# print(rasp)
